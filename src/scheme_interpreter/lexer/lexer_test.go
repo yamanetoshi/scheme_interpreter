@@ -8,7 +8,8 @@ import (
 
 func TestNextToken(t *testing.T) {
         input := `5
-'xxx
+x
+(quote xxx)
 (define x 5)
 (define x (lambda (x) (+ 1 x)))
 (define add4 (let ((x 4)) (lambda (y) (+ x y))))
@@ -19,8 +20,11 @@ func TestNextToken(t *testing.T) {
 		expectedLiteral string
 	}{
 	        {token.INT, "5"},
-		{token.QUOTE, "'"},
+		{token.IDENT, "x"},
+		{token.LPAREN, "("},
+		{token.QUOTE, "quote"},
 		{token.IDENT, "xxx"},
+		{token.RPAREN, ")"},
 		{token.LPAREN, "("},
 		{token.DEFINE, "define"},
 		{token.IDENT, "x"},
