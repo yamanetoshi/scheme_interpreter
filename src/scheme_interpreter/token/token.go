@@ -13,7 +13,7 @@ const (
 
 	// Operators
 //	BANG     = "!"
-	QUOTE    = "'"
+	QUOTE    = "QUOTE"
 
 	LT = "<"
 	GT = ">"
@@ -49,6 +49,7 @@ var keywords = map[string]TokenType{
 	"if":     IF,
 	"else":   ELSE,
 	"lambda": LAMBDA,
+	"quote":  QUOTE,
 }
 
 func LookupIdent(ident string) TokenType {
