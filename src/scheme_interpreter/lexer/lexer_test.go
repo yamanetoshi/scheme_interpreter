@@ -9,7 +9,6 @@ import (
 func TestNextToken(t *testing.T) {
         input := `5
 x
-(quote (1 . ()))
 (quote xxx)
 (cons 1 ())
 (define x 5)
@@ -24,17 +23,7 @@ x
 	        {token.INT, "5"},
 		{token.IDENT, "x"},
 		{token.LPAREN, "("},
-		{token.QUOTE, "quote"},
-		{token.LPAREN, "("},
-		{token.INT, "1"},
-		{token.DOT, "."},
-		{token.LPAREN, "("},
-		{token.RPAREN, ")"},
-		{token.RPAREN, ")"},
-		{token.RPAREN, ")"},
-		{token.LPAREN, "("},
-		{token.QUOTE, "quote"},
-		{token.IDENT, "xxx"},
+		{token.QUOTE, "xxx"},
 		{token.RPAREN, ")"},
 		{token.LPAREN, "("},
 		{token.CONS, "cons"},

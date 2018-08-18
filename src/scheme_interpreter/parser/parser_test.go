@@ -6,6 +6,35 @@ import (
 	"testing"
 )
 
+func TestQuoteExpression(t *testing.T) {
+	input := "(quote 5)"
+
+	l := lexer.New(input)
+	p := New(l)
+	program := p.ParseProgram()
+	checkParserErrors(t, p)
+
+	if len(program.Statements) != 3 {
+		t.Fatalf("program has not enough statements. got=%d",
+			len(program.Statements))
+	}
+	stmt, ok := program.Statements[1].(*ast.ExpressionStatement)
+	if !ok {
+		t.Fatalf("program.Statements[0] is not ast.ExpressionStatement. got=%T",
+			program.Statements[0])
+	}
+
+	if stmt.Token.Type != "QUOTE" {
+		t.Fatalf("exp not QUOTE. got=%T", stmt.Token.Type)
+	}
+
+	if stmt.Token.Literal != "5" {
+		t.Errorf("literal.TokenLiteral not %s. got=%s", "5",
+			stmt.Token.Literal)
+	}
+
+}
+
 func TestIntegerLiteralExpression(t *testing.T) {
 	input := "5"
 
