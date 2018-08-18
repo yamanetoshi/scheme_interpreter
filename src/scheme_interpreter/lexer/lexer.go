@@ -50,6 +50,8 @@ func (l *Lexer) NextToken() token.Token {
 			l.skipWhitespace()
 			if isLetter(l.ch) {
 				tok.Literal = l.readIdentifier()
+			} else if isSExpression(l.ch) {
+				tok.Literal = l.readSExpression()
 			}
 			return tok			
 		} else if isDigit(l.ch) {
@@ -109,6 +111,21 @@ func (l *Lexer) readNumber() string {
 	return l.input[position:l.position]
 }
 
+func (l *Lexer) readSExpression() string {
+	position := l.position
+	SCtr := 1
+	for SCtr != 0 {
+		l.readChar()
+		if l.input[l.position] == '(' {
+			SCtr += 1
+		} else if l.input[l.position] == ')' {
+			SCtr -= 1
+		}
+	}
+	l.readChar()
+	return l.input[position:l.position]
+}
+
 func (l *Lexer) isQuote() bool {
 	position := l.position
 	readPosition := l.readPosition
@@ -122,6 +139,10 @@ func (l *Lexer) isQuote() bool {
 	l.readPosition = readPosition
 	l.ch = l.input[position]
 	return false
+}
+
+func isSExpression(ch byte) bool {
+	return '(' == ch
 }
 
 func isLetter(ch byte) bool {
