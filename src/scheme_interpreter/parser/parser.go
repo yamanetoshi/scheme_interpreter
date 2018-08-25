@@ -48,40 +48,51 @@ func (p *Parser) Errors() []string {
 
 func (p *Parser) ParseProgram() *ast.Program {
 	program := &ast.Program{}
-	program.Statements = []ast.Statement{}
+	program.Statements = []ast.ExpressionStatement{}
 
 	for !p.curTokenIs(token.EOF) {
-		stmt := p.parseStatement()
-		if stmt != nil {
+		//		stmt := p.parseStatement()
+		stmt := p.parseExpressionStatement()
+		if &stmt != nil {
 			program.Statements = append(program.Statements, stmt)
 		}
-		p.nextToken()
 	}
 
 	return program
 }
 
-func (p *Parser) parseStatement() ast.Statement {
-	return p.parseExpressionStatement()
-}
-
-func (p *Parser) parseExpressionStatement() *ast.ExpressionStatement {
+func (p *Parser) parseExpressionStatement() ast.ExpressionStatement {
 	stmt := &ast.ExpressionStatement{Token: p.curToken}
 
 	switch p.curToken.Type {
 	case token.INT:
 		stmt.Expression = p.parseIntegerLiteral()
+		p.nextToken()
 	case token.IDENT:
 		stmt.Expression = p.parseIdentifier()
+		p.nextToken()
+	case token.QUOTE:
+		return *stmt
 	default:
 		stmt.Expression = p.parseExpression()
 	}
 
-	return stmt
+	return *stmt
 }
 
 func (p *Parser) parseExpression() ast.Expression {
-	return nil
+	se := &ast.SExpression{}
+	
+	p.nextToken()
+	se.Car = p.parseExpressionStatement()
+	
+	p.nextToken()
+	if !p.curTokenIs(token.RPAREN) {
+		se.Cdr = p.parseExpressionStatement()
+	}
+	p.nextToken()
+	
+	return se
 }
 
 func (p *Parser) parseIdentifier() ast.Expression {
