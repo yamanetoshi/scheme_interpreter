@@ -11,18 +11,13 @@ type Node interface {
 	String() string
 }
 
-type Statement interface {
-	Node
-	statementNode()
-}
-
 type Expression interface {
 	Node
 	expressionNode()
 }
 
 type Program struct {
-	Statements []Statement
+	Statements []ExpressionStatement
 }
 
 func (p *Program) TokenLiteral() string {
@@ -48,13 +43,27 @@ type ExpressionStatement struct {
 	Expression Expression
 }
 
-func (es *ExpressionStatement) statementNode()       {}
+func (es *ExpressionStatement) expressionNode()       {}
 func (es *ExpressionStatement) TokenLiteral() string { return es.Token.Literal }
 func (es *ExpressionStatement) String() string {
 	if es.Expression != nil {
 		return es.Expression.String()
 	}
 	return ""
+}
+
+type SExpression struct {
+	Car ExpressionStatement
+	Cdr ExpressionStatement
+}
+
+func (se *SExpression) expressionNode()      {}
+func (se *SExpression) TokenLiteral() string { return "" }
+func (se *SExpression) String() string       {
+	if &se.Car != nil {
+		return "(" + se.Car.String() + "." + se.Cdr.String() + ")"
+	}
+	return "()"
 }
 
 type Identifier struct {

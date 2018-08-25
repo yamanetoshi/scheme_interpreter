@@ -14,23 +14,25 @@ func TestQuoteExpression(t *testing.T) {
 	program := p.ParseProgram()
 	checkParserErrors(t, p)
 
-	if len(program.Statements) != 3 {
+	if len(program.Statements) != 1 {
 		t.Fatalf("program has not enough statements. got=%d",
 			len(program.Statements))
 	}
-	stmt, ok := program.Statements[1].(*ast.ExpressionStatement)
+	tmp := program.Statements[0]
+
+	stmt, ok := tmp.Expression.(*ast.SExpression)
 	if !ok {
-		t.Fatalf("program.Statements[0] is not ast.ExpressionStatement. got=%T",
-			program.Statements[0])
+		t.Fatalf("program.Statements[0].Expression is not ast.ExpressionStatement. got=%T",
+			tmp)
 	}
 
-	if stmt.Token.Type != "QUOTE" {
-		t.Fatalf("exp not QUOTE. got=%T", stmt.Token.Type)
+	if stmt.Car.Token.Type != "QUOTE" {
+		t.Fatalf("exp not QUOTE. got=%T", stmt.Car.Token.Type)
 	}
 
-	if stmt.Token.Literal != "5" {
+	if stmt.Car.Token.Literal != "5" {
 		t.Errorf("literal.TokenLiteral not %s. got=%s", "5",
-			stmt.Token.Literal)
+			stmt.Car.Token.Literal)
 	}
 
 }
@@ -43,23 +45,26 @@ func TestQuoteExpression2(t *testing.T) {
 	program := p.ParseProgram()
 	checkParserErrors(t, p)
 
-	if len(program.Statements) != 3 {
+	if len(program.Statements) != 1 {
 		t.Fatalf("program has not enough statements. got=%d",
 			len(program.Statements))
 	}
-	stmt, ok := program.Statements[1].(*ast.ExpressionStatement)
+
+	tmp := program.Statements[0]
+
+	stmt, ok := tmp.Expression.(*ast.SExpression)
 	if !ok {
-		t.Fatalf("program.Statements[0] is not ast.ExpressionStatement. got=%T",
-			program.Statements[0])
+		t.Fatalf("program.Statements[0].Expression is not ast.ExpressionStatement. got=%T",
+			tmp)
 	}
 
-	if stmt.Token.Type != "QUOTE" {
-		t.Fatalf("exp not QUOTE. got=%T", stmt.Token.Type)
+	if stmt.Car.Token.Type != "QUOTE" {
+		t.Fatalf("exp not QUOTE. got=%T", stmt.Car.Token.Type)
 	}
 
-	if stmt.Token.Literal != "(1 2)" {
+	if stmt.Car.Token.Literal != "(1 2)" {
 		t.Errorf("literal.TokenLiteral not %s. got=%s", "(1 2)",
-			stmt.Token.Literal)
+			stmt.Car.Token.Literal)
 	}
 
 }
@@ -76,12 +81,7 @@ func TestIntegerLiteralExpression(t *testing.T) {
 		t.Fatalf("program has not enough statements. got=%d",
 			len(program.Statements))
 	}
-	stmt, ok := program.Statements[0].(*ast.ExpressionStatement)
-	if !ok {
-		t.Fatalf("program.Statements[0] is not ast.ExpressionStatement. got=%T",
-			program.Statements[0])
-	}
-
+	stmt := program.Statements[0]
 	literal, ok := stmt.Expression.(*ast.IntegerLiteral)
 	if !ok {
 		t.Fatalf("exp not *ast.IntegerLiteral. got=%T", stmt.Expression)
@@ -107,12 +107,8 @@ func TestIdentifierExpression(t *testing.T) {
 		t.Fatalf("program has not enough statements. got=%d",
 			len(program.Statements))
 	}
-	stmt, ok := program.Statements[0].(*ast.ExpressionStatement)
-	if !ok {
-		t.Fatalf("program.Statements[0] is not ast.ExpressionStatement. got=%T",
-			program.Statements[0])
-	}
 
+	stmt := program.Statements[0]
 	ident, ok := stmt.Expression.(*ast.Identifier)
 	if !ok {
 		t.Fatalf("exp not *ast.Identifier. got=%T", stmt.Expression)
