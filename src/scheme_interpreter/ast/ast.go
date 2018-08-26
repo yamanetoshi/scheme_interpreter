@@ -53,8 +53,8 @@ func (es *ExpressionStatement) String() string {
 }
 
 type SExpression struct {
-	Car ExpressionStatement
-	Cdr ExpressionStatement
+	Car Expression
+	Cdr Expression
 }
 
 func (se *SExpression) expressionNode()      {}

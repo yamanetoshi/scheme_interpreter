@@ -46,49 +46,59 @@ func (p *Parser) Errors() []string {
 	return p.errors
 }
 
-func (p *Parser) ParseProgram() *ast.Program {
-	program := &ast.Program{}
-	program.Statements = []ast.ExpressionStatement{}
-
-	for !p.curTokenIs(token.EOF) {
-		//		stmt := p.parseStatement()
-		stmt := p.parseExpressionStatement()
-		if &stmt != nil {
-			program.Statements = append(program.Statements, stmt)
-		}
-	}
-
-	return program
-}
-
-func (p *Parser) parseExpressionStatement() ast.ExpressionStatement {
+func (p *Parser) ParseExpressionStatement() ast.ExpressionStatement {
 	stmt := &ast.ExpressionStatement{Token: p.curToken}
+	for !p.curTokenIs(token.EOF) {
+		switch p.curToken.Type {
+		case token.INT:
+			stmt.Expression = p.parseIntegerLiteral()
+		case token.IDENT:
+			stmt.Expression = p.parseIdentifier()
+		case token.QUOTE:
+			stmt.Expression = &ast.ExpressionStatement{Token: p.curToken}
+		default:
+			p.nextToken() // thru LPAREN
+			stmt.Expression = p.parseExpression()
+		}
 
-	switch p.curToken.Type {
-	case token.INT:
-		stmt.Expression = p.parseIntegerLiteral()
 		p.nextToken()
-	case token.IDENT:
-		stmt.Expression = p.parseIdentifier()
-		p.nextToken()
-	case token.QUOTE:
-		return *stmt
-	default:
-		stmt.Expression = p.parseExpression()
 	}
 
 	return *stmt
 }
 
+func (p *Parser) parseExpressionInner() ast.Expression {
+	switch p.curToken.Type {
+	case token.INT:
+		return p.parseIntegerLiteral()
+	case token.IDENT:
+		return p.parseIdentifier()
+	case token.QUOTE:
+		return &ast.ExpressionStatement{Token: p.curToken}
+	default:
+		p.nextToken() // thru LPAREN
+		return p.parseExpression()
+	}
+}
+
 func (p *Parser) parseExpression() ast.Expression {
-	se := &ast.SExpression{}
+	// null list ()
+	// single (1)
+	// double (1 2)
+	// other (1 2 3 ...)
 	
-	p.nextToken()
-	se.Car = p.parseExpressionStatement()
+	se := &ast.SExpression{}
+
+	if p.curToken.Type == token.RPAREN {
+		// null list
+		return se
+	}
+	
+	se.Car = p.parseExpressionInner()
 	
 	p.nextToken()
 	if !p.curTokenIs(token.RPAREN) {
-		se.Cdr = p.parseExpressionStatement()
+		se.Cdr = p.parseExpression()
 	}
 	p.nextToken()
 	
