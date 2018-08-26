@@ -6,33 +6,44 @@ import (
 	"testing"
 )
 
+func TestSExpression(t *testing.T) {
+	input := "(1 2)"
+
+	l := lexer.New(input)
+	p := New(l)
+	stmt := p.ParseExpressionStatement()
+	checkParserErrors(t, p)
+
+	_, ok := stmt.Expression.(*ast.SExpression)
+	if !ok {
+		t.Fatalf("exp not *ast.IntegerLiteral. got=%T", stmt.Expression)
+	}
+}
+
 func TestQuoteExpression(t *testing.T) {
 	input := "(quote 5)"
 
 	l := lexer.New(input)
 	p := New(l)
-	program := p.ParseProgram()
+	stmt := p.ParseExpressionStatement()
 	checkParserErrors(t, p)
-
-	if len(program.Statements) != 1 {
-		t.Fatalf("program has not enough statements. got=%d",
-			len(program.Statements))
-	}
-	tmp := program.Statements[0]
-
-	stmt, ok := tmp.Expression.(*ast.SExpression)
+	
+	exp, ok := stmt.Expression.(*ast.SExpression)
 	if !ok {
-		t.Fatalf("program.Statements[0].Expression is not ast.ExpressionStatement. got=%T",
-			tmp)
+		t.Fatalf("exp not *ast.IntegerLiteral. got=%T", stmt.Expression)
+	}
+	car, ok := exp.Car.(*ast.ExpressionStatement)
+	if !ok {
+		t.Fatalf("exp not *ast.IntegerLiteral. got=%T", stmt.Expression)
 	}
 
-	if stmt.Car.Token.Type != "QUOTE" {
-		t.Fatalf("exp not QUOTE. got=%T", stmt.Car.Token.Type)
+	if car.Token.Type != "QUOTE" {
+		t.Fatalf("exp not QUOTE. got=%T", car.Token.Type)
 	}
 
-	if stmt.Car.Token.Literal != "5" {
+	if car.Token.Literal != "5" {
 		t.Errorf("literal.TokenLiteral not %s. got=%s", "5",
-			stmt.Car.Token.Literal)
+			car.Token.Literal)
 	}
 
 }
@@ -42,31 +53,24 @@ func TestQuoteExpression2(t *testing.T) {
 
 	l := lexer.New(input)
 	p := New(l)
-	program := p.ParseProgram()
+	stmt := p.ParseExpressionStatement()
 	checkParserErrors(t, p)
-
-	if len(program.Statements) != 1 {
-		t.Fatalf("program has not enough statements. got=%d",
-			len(program.Statements))
-	}
-
-	tmp := program.Statements[0]
-
-	stmt, ok := tmp.Expression.(*ast.SExpression)
+	exp, ok := stmt.Expression.(*ast.SExpression)
 	if !ok {
-		t.Fatalf("program.Statements[0].Expression is not ast.ExpressionStatement. got=%T",
-			tmp)
+		t.Fatalf("exp not *ast.IntegerLiteral. got=%T", stmt.Expression)
+	}
+	car, ok := exp.Car.(*ast.ExpressionStatement)
+	if !ok {
+		t.Fatalf("exp not *ast.IntegerLiteral. got=%T", stmt.Expression)
+	}
+	if car.Token.Type != "QUOTE" {
+		t.Fatalf("exp not QUOTE. got=%T", car.Token.Type)
 	}
 
-	if stmt.Car.Token.Type != "QUOTE" {
-		t.Fatalf("exp not QUOTE. got=%T", stmt.Car.Token.Type)
-	}
-
-	if stmt.Car.Token.Literal != "(1 2)" {
+	if car.Token.Literal != "(1 2)" {
 		t.Errorf("literal.TokenLiteral not %s. got=%s", "(1 2)",
-			stmt.Car.Token.Literal)
+			car.Token.Literal)
 	}
-
 }
 
 func TestIntegerLiteralExpression(t *testing.T) {
@@ -74,14 +78,9 @@ func TestIntegerLiteralExpression(t *testing.T) {
 
 	l := lexer.New(input)
 	p := New(l)
-	program := p.ParseProgram()
+	stmt := p.ParseExpressionStatement()
 	checkParserErrors(t, p)
 
-	if len(program.Statements) != 1 {
-		t.Fatalf("program has not enough statements. got=%d",
-			len(program.Statements))
-	}
-	stmt := program.Statements[0]
 	literal, ok := stmt.Expression.(*ast.IntegerLiteral)
 	if !ok {
 		t.Fatalf("exp not *ast.IntegerLiteral. got=%T", stmt.Expression)
@@ -100,15 +99,9 @@ func TestIdentifierExpression(t *testing.T) {
 
 	l := lexer.New(input)
 	p := New(l)
-	program := p.ParseProgram()
+	stmt := p.ParseExpressionStatement()
 	checkParserErrors(t, p)
 
-	if len(program.Statements) != 1 {
-		t.Fatalf("program has not enough statements. got=%d",
-			len(program.Statements))
-	}
-
-	stmt := program.Statements[0]
 	ident, ok := stmt.Expression.(*ast.Identifier)
 	if !ok {
 		t.Fatalf("exp not *ast.Identifier. got=%T", stmt.Expression)
